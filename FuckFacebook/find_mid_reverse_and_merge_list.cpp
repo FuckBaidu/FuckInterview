@@ -1,3 +1,8 @@
+/**
+ *  reverse the last half of single linked list, the merge the list with first half of the list
+ *  eg: Input:  a->b->c->d->e->f->g
+ *      Output: a->g->b->f->c->e->d
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
