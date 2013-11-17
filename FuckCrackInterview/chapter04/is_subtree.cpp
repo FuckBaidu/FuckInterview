@@ -15,7 +15,7 @@ bool IsSubTree(Node<T> *t1, Node<T> *t2, Node<T> *root) {
         return IsSubTree(t1->left, t2->left, root)
                && IsSubTree(t1->right, t2->right, root);
     } else {
-        if (root == t2)
+        if (t2 == root)
             return IsSubTree(t1->left, root, root)
                    || IsSubTree(t1->right, root, root);
         else

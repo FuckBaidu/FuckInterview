@@ -100,16 +100,22 @@ public:
     }
 
 private:
-    int _FindFirstCommonAncestor(Node<T> *cur, Node<T> *node1, Node<T> *node2,
+    bool _FindFirstCommonAncestor(Node<T> *cur, Node<T> *node1, Node<T> *node2,
             Node<T> **result) {
         if (!cur)
-            return 0;
-        int find_count = (cur == node1 || cur == node2)
-                         + _FindFirstCommonAncestor(cur->left, node1, node2, result)
-                         + _FindFirstCommonAncestor(cur->right, node1, node2, result);
-        if (find_count == 2 && *result == NULL)
+            return false;
+        if (*result != NULL)
+            return true;
+        bool find_left = _FindFirstCommonAncestor(cur->left, node1, node2, result);
+        if (*result != NULL)
+            return true;
+        bool find_right = _FindFirstCommonAncestor(cur->right, node1, node2, result);
+        if (*result != NULL)
+            return true;
+        bool find_cur = (cur == node1 || cur == node2);
+        if (find_left && find_right || find_left && find_cur || find_right && find_cur)
             *result = cur;
-        return find_count;
+        return find_left || find_right || find_cur;
     }
 };
 

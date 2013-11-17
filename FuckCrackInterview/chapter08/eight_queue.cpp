@@ -26,9 +26,9 @@ void ArrangeQueues(std::vector< std::pair<int, int> > &result) {
                 }
             }
             if (!is_conflict) {
-                std::vector< std::pair<int, int> > tmp = result;
-                tmp.push_back(cur);
-                ArrangeQueues(tmp);
+                result.push_back(cur);
+                ArrangeQueues(result);
+                result.erase(result.begin() + cur.first, result.end());
             }
         }
     }

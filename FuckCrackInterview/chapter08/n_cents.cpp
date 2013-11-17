@@ -5,63 +5,14 @@
  */
 #include <iostream>
 #include <vector>
+#include <set>
+#define NUM 4
 enum Money{
     Quarter = 25,
     Dime = 10,
     Nickel = 5,
     Penny = 1,
 };
-#define NUM 4
-
-void RepresentNCents(int n, std::vector<Money> &result) {
-    if (n == 0) {
-        int counts[(int)NUM];
-        memset(counts, 0, sizeof(counts));
-        for (int i = 0; i < result.size(); i++) {
-            int index = 0;
-            switch ((Money)result[i]) {
-                case Quarter:
-                    index = 0;
-                    break;
-                case Dime:
-                    index = 1;
-                    break;
-                case Nickel:
-                    index = 2;
-                    break;
-                case Penny:
-                    index = 3;
-                    break;
-            }
-            counts[index]++;
-        }
-        std::cout << counts[0] << " quarters," << counts[1] << " dimes," << counts[2]
-            << " nickels," << counts[3] << " pennies" << std::endl;
-    } else {
-        for (int i = 0; i < (int)NUM; i++) {
-            Money cur;
-            switch (i) {
-            case 0:
-                cur = Quarter;
-                break;
-            case 1:
-                cur = Dime;
-                break;
-            case 2:
-                cur = Nickel;
-                break;
-            case 3:
-                cur = Penny;
-                break;
-            }
-            if (n >= cur) {
-                std::vector<Money> tmp = result;
-                tmp.push_back(cur);
-                RepresentNCents(n - (int)cur, tmp);
-            }
-        }
-    }
-}
 
 void BestRepresentNCents(int n) {
     std::vector<Money> result;
@@ -102,9 +53,43 @@ void BestRepresentNCents(int n) {
         << " nickels," << counts[3] << " pennies" << std::endl;
 }
 
+void MakeChanges(int n, int *counts, Money cur_change) {
+    if (cur_change == Penny) {
+        counts[3] = n;
+        std::cout << counts[0] << " quarters," << counts[1] << " dimes," << counts[2]
+            << " nickels," << counts[3] << " pennies" << std::endl;
+    } else {
+        int index = 0;
+        Money next_change;
+        switch (cur_change) {
+        case Quarter:
+            index = 0;
+            next_change = Dime;
+            break;
+        case Dime:
+            index = 1;
+            next_change = Nickel;
+            break;
+        case Nickel:
+            index = 3;
+            next_change = Penny;
+            break;
+        }
+        for (int i = 0; (int)cur_change * i <= n; i++) {
+            counts[index] = i;
+            MakeChanges(n - (int)cur_change * i, counts, next_change);
+        }
+    }
+}
+
+void MakeChanges(int n) {
+    int counts[NUM];
+    memset(counts, 0, sizeof(counts));
+    MakeChanges(n, counts, Quarter);
+}
+
 int main() {
-    std::vector<Money> result;
-    RepresentNCents(34, result);
+    MakeChanges(34);
     BestRepresentNCents(34);
     return 0;
 }

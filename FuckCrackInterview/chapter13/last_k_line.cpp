@@ -21,6 +21,9 @@ int main(int argc, const char *argv[]) {
             if (!ifs.eof())
                 buffer[line_count++ % K] = tmp;
         }
+        //while (!ifs.eof()) {
+        //        ifs >> buffer[line_count++ % K];
+        //}
         int offset = line_count % K;
         for (int i = offset; i < K + offset; i++)
             if (i % K < line_count)

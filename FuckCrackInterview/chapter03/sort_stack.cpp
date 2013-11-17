@@ -10,7 +10,7 @@ void Sort(ArrayStack<int> &stack) {
     while (!stack.empty()) {
         int cur = stack.pop();
         int count = 0;
-        while (!helper.empty() && helper.peek() > cur) {
+        while (!helper.empty() && helper.peek() < cur) {
             count++;
             stack.push(helper.pop());
         }

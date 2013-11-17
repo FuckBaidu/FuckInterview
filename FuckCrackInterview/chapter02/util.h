@@ -12,7 +12,7 @@ struct Node {
 };
 
 template <class T>
-void PrintList(Node<T> *head) {
+void PrintList(const Node<T> *head) {
     while (head != NULL) {
         std::cout << head->value;
         if (head->next)
@@ -33,7 +33,7 @@ void FreeList(Node<T> *head) {
 }
 
 template <class T>
-Node<T> *InitList(T *array, int len) {
+Node<T> *InitList(const T *array, int len) {
     if (!array)
         return NULL;
     Node<T> *head = NULL, *cur = NULL;
