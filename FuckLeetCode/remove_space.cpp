@@ -3,18 +3,18 @@
 
 #include <iostream>
 using namespace std;
-void RemoveSpaces(char *str) {
-    if (str == NULL)
-        return;
-    char *ptr1 = str;
-    char *ptr2 = str;
-    do {
-        if (*ptr2 == ' ')
-            ptr2++;
-        *ptr1++ = *ptr2++;
-    } while (*ptr1 != '\0') ;
-}
 
+void RemoveSpaces(char *str) {
+    if (!str)
+        return;
+    char *i = str, *j = str;
+    while (*i != '\0') {
+        if (*i != ' ')
+            *j++ = *i;
+        i++;
+    }
+    *j = '\0';
+}
 
 int main() {
     char str[32] = "Hello world !";

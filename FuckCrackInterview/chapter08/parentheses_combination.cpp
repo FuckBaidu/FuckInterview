@@ -6,17 +6,28 @@
 #include <vector>
 #include <string>
 
-std::vector<std::string> ParenthesesCombination(int n) {
-    std::vector<std::string> result;
-    if (n == 1) {
-        result.push_back("()");
+void GenerateParenthesis(char *buf, int left_count, int right_cout, int n,
+                         std::vector<std::string> &result) {
+    if (left_count == n && right_cout == n) {
+        result.push_back(std::string(buf, 2 * n));
     } else {
-        std::vector<std::string> tmp = ParenthesesCombination(n - 1);
-        for (int i = 0; i < tmp.size(); i++) {
-            result.push_back("()" + tmp[i]);
-            result.push_back("("+tmp[i]+")");
+        if (left_count < n) {
+            buf[left_count + right_cout] = '(';
+            GenerateParenthesis(buf, left_count + 1, right_cout, n, result);
+        }
+
+        if (right_cout < left_count) {
+            buf[left_count + right_cout] = ')';
+            GenerateParenthesis(buf, left_count, right_cout + 1, n, result);
         }
     }
+}
+
+std::vector<std::string> ParenthesesCombination(int n) {
+    std::vector<std::string> result;
+    char *buf = new char[2 * n];
+    GenerateParenthesis(buf, 0, 0, n, result);
+    delete[] buf;
     return result;
 }
 

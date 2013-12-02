@@ -31,10 +31,40 @@ Node<int>* Sum(Node<int> *head1, Node<int> *head2) {
     return result;
 }
 
+Node<int> *Sum1(const Node<int> *l1, const Node<int> *l2) {
+    int carry = 0, sum = 0;
+    Node<int> *head = NULL, *cur = NULL;
+    while (l1 || l2) {
+        int num1 = l1? l1->value : 0;
+        int num2 = l2? l2->value: 0;
+        sum = (num1 + num2 + carry) % 10;
+        carry = (num1 + num2 + carry) / 10;
+        Node<int> *new_node = new Node<int>(sum);
+        new_node->next = NULL;
+        if (!head) {
+            head = new_node;
+        } else {
+            cur->next = new_node;
+        }
+        cur = new_node;
+
+        if (l1)
+            l1 = l1->next;
+        if (l2)
+            l2 = l2->next;
+    }
+    if (carry) {
+        Node<int> *new_node = new Node<int>(sum);
+        new_node->next = NULL;
+        cur->next = new_node;
+    }
+    return head;
+}
+
 void Test(int *array1, int len1, int *array2, int len2) {
     Node<int> *head1 = InitList(array1, len1);
     Node<int> *head2 = InitList(array2, len2);
-    Node<int> *result = Sum(head1, head2);
+    Node<int> *result = Sum1(head1, head2);
     PrintList(head1);
     std::cout << "Add" << std::endl;
     PrintList(head2);
