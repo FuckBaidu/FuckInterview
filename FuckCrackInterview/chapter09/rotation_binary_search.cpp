@@ -8,23 +8,25 @@ int RotationBinarySearch(int *A, int len, int key) {
     int begin = 0, end = len - 1;
     int pos = -1;
     while (begin <= end) {
-        int mid = (begin + end) / 2;
+        int mid = begin + (end - begin) / 2; // in case of overflow
         if (A[mid] == key) {
             pos = mid;
             break;
         }
-
-        if (A[begin] <= A[mid] && A[mid] <= A[end]) {
-            if (key < A[mid])
+        // first part is sorted
+        if (A[begin] < A[mid]) {
+            if (A[begin] <= key && key < A[mid])
                 end = mid - 1;
             else
                 begin = mid + 1;
-        } else {
-            if ((key < A[mid] && key >= A[begin]) || (key > A[mid] && key >= A[end]))
-                end = mid - 1;
-            else
+        } else if (A[begin] > A[mid]) {
+            // second part is sorted
+            if (A[mid] < key && key <= A[end])
                 begin = mid + 1;
-        }
+            else
+                end = mid - 1;
+        } else
+            begin++;
     }
     return pos;
 }
@@ -45,5 +47,16 @@ int main() {
     Test(A, sizeof(A) / sizeof(int), 16);
     Test(A, sizeof(A) / sizeof(int), 19);
     Test(A, sizeof(A) / sizeof(int), 1);
+    int b[] = {5, 1, 3};
+    Test(b, 3, 3);
+    Test(b, 3, 5);
+    int c[] = {1, 1, 3, 1};
+    Test(c, 4, 3);
+    int d[] = {1, 3, 5};
+    Test(d, 3, 1);
+    int e[] = {1, 1, 1, 3, 1};
+    Test(e, 5, 3);
+    int f[] = {1, 3, 1, 1, 1};
+    Test(f, 5, 3);
     return 0;
 }
