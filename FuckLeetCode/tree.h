@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <queue>
+#include <deque>
+#include <iomanip>
 
 template <class T>
 struct Node {
@@ -97,9 +99,96 @@ public:
         if (root == _root)
             _root = NULL;
     }
+    
+    int GetHeight() {
+        return _GetHeight(_root);
+    }
 
     void Print() {
-       _Print(_root, 0);
+        std::deque<Node<T>*> cur_nodes;
+        cur_nodes.push_back(_root);
+        int height = GetHeight();
+        // The lenth of underline before node:"___10___", branch_len is 3;
+        int branch_len = (1 << height) - 2;
+        // Starting space to the first node to print of each level 
+        // (for the left most node of each level only)
+        int start_len = 0;
+        // Distance between nodes
+        int node_space_len = (1 << (height + 1)) + 2;
+        for (int h = 1; h <= height; h++) {
+            node_space_len = (node_space_len >> 1) + 1;
+            branch_len = (branch_len >> 1) - 1;
+            start_len = branch_len + 2;
+            int num_nodes = 1 << (h - 1);
+            //print branches and nodes
+            typename std::deque<Node<T>*>::const_iterator iter = cur_nodes.begin();
+            for (int i = 0; i < num_nodes; i++, ++iter) {
+                if (h != height) {
+                    if (i == 0)
+                        std::cout << std::setw(start_len) << "";
+                    else
+                        std::cout << std::setw(node_space_len) << "";
+                    if (*iter && (*iter)->left)
+                        std::cout << std::setfill('_');
+                    else
+                        std::cout << std::setfill(' ');
+                    // Add 2 is for the width of node' value
+                    std::cout << std::setw(branch_len + 2);
+                    if (*iter)
+                        std::cout << (*iter)->value;
+                    else
+                        std::cout << "";
+                    if (*iter && (*iter)->right)
+                        std::cout << std::setfill('_');
+                    else
+                        std::cout << std::setfill(' ');
+                    std::cout << std::setw(branch_len) << "";
+                    //reset
+                    std::cout << std::setfill(' ');
+                } else {
+                    if (i == 0)
+                        std::cout << std::setw(2) << "";
+                    else
+                        std::cout << std::setw(4) << "";
+                    if (*iter)
+                        std::cout << (*iter)->value;
+                    else
+                        std::cout << "";
+                }
+            }
+            std::cout << std::endl;
+            //print arms
+            if (h != height) {
+                iter = cur_nodes.begin();
+                for (int i = 0; i < num_nodes; i++, iter++) {
+                    if (i == 0)
+                        std::cout << std::setw(start_len - 1) << "";
+                    else
+                        std::cout << std::setw(node_space_len - 2) << "";
+                    if (*iter && (*iter)->left)
+                        std::cout << '/';
+                    else
+                        std::cout << ' ';
+                    std::cout << std::setw(2 * branch_len + 2) << "";
+                    if (*iter && (*iter)->right)
+                        std::cout << '\\';
+                    else
+                        std::cout << ' ';
+                }
+                std::cout << std::endl;
+            }
+            for (int i = 0; i < num_nodes; i++) {
+                Node<T> *cur = cur_nodes.front();
+                cur_nodes.pop_front();
+                if (cur) {
+                    cur_nodes.push_back(cur->left);
+                    cur_nodes.push_back(cur->right);
+                } else {
+                    cur_nodes.push_back(NULL);
+                    cur_nodes.push_back(NULL);
+                }
+            }
+        }
     }
 
     void PrintByLevel() {
@@ -179,6 +268,12 @@ public:
     }
 
 private:
+    int _GetHeight(Node<T> *node) {
+        int left_height = node->left? _GetHeight(node->left) : 0;
+        int right_height = node->right? _GetHeight(node->right) : 0;
+        return std::max(left_height, right_height) + 1;
+    }
+
     void _Print(Node<T> *root, int num_spaces) {
         if (!root)
             return;

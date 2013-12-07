@@ -34,27 +34,43 @@ void GenerateMatrix(int ***ptr, int m, int n) {
     *ptr = matrix;
 }
 
+//use constant space
 void ZeroMatrix(int **matrix, int m, int n) {
-    bool *zero_row = new bool[m];
-    bool *zero_col = new bool[n];
-    memset(zero_row, sizeof(bool) * m, 0);
-    memset(zero_col, sizeof(bool) * n, 0);
-
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            if (!matrix[i][j]) {
-                zero_row[i] = true;
-                zero_col[j] = true;
+    // use first row and first col as the storage for flags array
+    bool need_zero_first_col = false, need_zero_first_row = false;
+    for (int col = 0; col < n; col++) {
+        if (matrix[0][col] == 0) {
+            need_zero_first_row = true;
+            break;
+        }
+    }
+    for (int row = 0; row < m; row++) {
+        if (matrix[row][0] == 0) {
+            need_zero_first_col = true;
+            break;
+        }
+    }
+    for (int row = 1; row < m; row++) {
+        for (int col = 1; col < n; col++) {
+            if (matrix[row][col] == 0) {
+                matrix[0][col] = 0;
+                matrix[row][0] = 0;
             }
         }
     }
 
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            if (zero_row[i] || zero_col[j])
-                matrix[i][j] = 0;
-        }
-    }
+    for (int row = 1; row < m; row++)
+        for (int col = 1; col < n; col++)
+            if (matrix[0][col] == 0 || matrix[row][0] == 0)
+                matrix[row][col] = 0;
+
+    if (need_zero_first_row)
+        for (int col = 0; col < n; col++)
+            matrix[0][col] = 0;
+
+    if (need_zero_first_col)
+        for (int row = 0; row < m; row++)
+            matrix[row][0] = 0;
 }
 
 int main() {
