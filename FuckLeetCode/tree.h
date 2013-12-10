@@ -5,6 +5,8 @@
 #include <iostream>
 #include <queue>
 #include <deque>
+#include <string>
+#include <sstream>
 #include <iomanip>
 
 template <class T>
@@ -18,88 +20,24 @@ struct Node {
 };
 
 template <class T>
-class BinarySearchTree {
+class BinaryTree {
 public:
-    BinarySearchTree() : _root(NULL) { }
-    ~BinarySearchTree() {
+    BinaryTree() : _root(NULL) { }
+    BinaryTree(const std::string &str) : _root(NULL) {
+        _Deserialize(str);
+    }
+
+    virtual ~BinaryTree() {
         if (!_root)
             DeleteTree(_root);
     }
 
-    BinarySearchTree(BinarySearchTree &other) {
-        _Assign(other);
+    virtual std::string Serialize() {
+        std::stringstream ss;
+        _SerializeHelper(_root, ss);
+        return ss.str();
     }
 
-    void Insert(T value) {
-        Node<T> *node = new Node<T>(value);
-        if (_root) {
-            Node<T> *cur = _root, *parent = NULL;
-            while (cur != NULL) {
-                parent = cur;
-                if (value < cur->value)
-                    cur = cur->left;
-                else
-                    cur = cur->right;
-            }
-            node->parent = parent;
-            if (value < parent->value)
-                parent->left = node;
-            else
-                parent->right = node;
-        } else {
-            _root = node;
-        }
-    }
-
-    Node<T>* Search(T value) {
-        Node<T> *cur = _root;
-        while (cur) {
-            if (value == cur->value)
-                break;
-            else if (value < cur->value)
-                cur = cur->left;
-            else
-                cur = cur->right;
-        }
-        return cur;
-    }
-
-    void Delete(Node<T> *node) {
-        if (!node)
-            return;
-        Node<T> *to_delete = node;
-        if (node->left && node->right) {
-            Node<T> *cur = NULL;
-            cur = node->left;
-            while (cur->right)
-                cur = cur->right;
-            node->value = cur->value;
-            to_delete = cur;
-        }
-
-        Node<T> *parent = to_delete->parent;
-        Node<T> *new_child = to_delete->left? to_delete->left : to_delete->right;
-        if (parent) {
-            if (to_delete == parent->left)
-               parent->left = new_child;
-            else
-               parent->right = new_child;
-        }
-        if (new_child)
-            new_child->parent = parent;
-        delete to_delete;
-    }
-
-    void DeleteTree(Node<T> *root) {
-        if (root->left)
-            DeleteTree(root->left);
-        if (root->right)
-            DeleteTree(root->right);
-        delete root;
-        if (root == _root)
-            _root = NULL;
-    }
-    
     int GetHeight() {
         return _GetHeight(_root);
     }
@@ -147,9 +85,9 @@ public:
                     std::cout << std::setfill(' ');
                 } else {
                     if (i == 0)
-                        std::cout << std::setw(2) << "";
+                        std::cout << std::setw(2);
                     else
-                        std::cout << std::setw(4) << "";
+                        std::cout << std::setw(4);
                     if (*iter)
                         std::cout << (*iter)->value;
                     else
@@ -260,34 +198,29 @@ public:
         return _root;
     }
 
-    BinarySearchTree& operator=(const BinarySearchTree &other) {
+    void DeleteTree(Node<T> *root) {
+        if (root->left)
+            DeleteTree(root->left);
+        if (root->right)
+            DeleteTree(root->right);
+        delete root;
+        if (root == _root)
+            _root = NULL;
+    }
+
+    BinaryTree& operator=(const BinaryTree &other) {
         if (this != &other) {
             _Assign(other);
         }
         return *this;
     }
 
-private:
-    int _GetHeight(Node<T> *node) {
-        int left_height = node->left? _GetHeight(node->left) : 0;
-        int right_height = node->right? _GetHeight(node->right) : 0;
-        return std::max(left_height, right_height) + 1;
+    BinaryTree(BinaryTree &other) {
+        _Assign(other);
     }
 
-    void _Print(Node<T> *root, int num_spaces) {
-        if (!root)
-            return;
-
-        if (root->right)
-            _Print(root->right, num_spaces + 5);
-        for (int i = 0; i < num_spaces; i++)
-            std::cout << " ";
-        std::cout << root->value << std::endl;
-        if (root->left)
-            _Print(root->left, num_spaces + 5);
-    }
-
-    void _Assign(const BinarySearchTree &other) {
+protected:
+    void _Assign(const BinaryTree &other) {
         DeleteTree(_root);
         _root = new Node<T>(*other._root);
         std::queue< Node<T>* > queue;
@@ -306,6 +239,140 @@ private:
         }
     }
 
+    virtual void _SerializeHelper(Node<T> *node, std::stringstream &ss) {
+        if (!node) {
+            ss << "$ ";
+        } else {
+            // pre-order
+            ss << node->value << " ";
+            _SerializeHelper(node->left, ss);
+            _SerializeHelper(node->right, ss);
+        }
+    }
+
+    virtual void _DeserializeHelper(std::stringstream &ss,  Node<T> *&node) {
+        if (ss.eof())
+            return;
+        std::string cur;
+        ss >> cur;
+        if (cur != "$") {
+            T value;
+            std::stringstream tmp_ss(cur);
+            tmp_ss >> value;
+            node = new Node<T>(value);
+            _DeserializeHelper(ss, node->left);
+            _DeserializeHelper(ss, node->right);
+        }
+    }
+
+    int _GetHeight(Node<T> *node) {
+        int left_height = node->left? _GetHeight(node->left) : 0;
+        int right_height = node->right? _GetHeight(node->right) : 0;
+        return std::max(left_height, right_height) + 1;
+    }
+
+    virtual void _Deserialize(const std::string &str) {
+        std::stringstream ss(str);
+        _DeserializeHelper(ss, _root);
+    }
+
     Node<T> *_root;
+};
+
+template <class T>
+class BinarySearchTree : public BinaryTree<T> {
+public:
+    BinarySearchTree() : BinaryTree<T>() { }
+    BinarySearchTree(const std::string &str) {
+        _Deserialize(str);
+    }
+    void Insert(T value) {
+        Node<T> *node = new Node<T>(value);
+        if (BinaryTree<T>::_root) {
+            Node<T> *cur = BinaryTree<T>::_root, *parent = NULL;
+            while (cur != NULL) {
+                parent = cur;
+                if (value < cur->value)
+                    cur = cur->left;
+                else
+                    cur = cur->right;
+            }
+            node->parent = parent;
+            if (value < parent->value)
+                parent->left = node;
+            else
+                parent->right = node;
+        } else {
+            BinaryTree<T>::_root = node;
+        }
+    }
+
+    Node<T>* Search(T value) {
+        Node<T> *cur = BinaryTree<T>::_root;
+        while (cur) {
+            if (value == cur->value)
+                break;
+            else if (value < cur->value)
+                cur = cur->left;
+            else
+                cur = cur->right;
+        }
+        return cur;
+    }
+
+    void Delete(Node<T> *node) {
+        if (!node)
+            return;
+        Node<T> *to_delete = node;
+        if (node->left && node->right) {
+            Node<T> *cur = NULL;
+            cur = node->left;
+            while (cur->right)
+                cur = cur->right;
+            node->value = cur->value;
+            to_delete = cur;
+        }
+
+        Node<T> *parent = to_delete->parent;
+        Node<T> *new_child = to_delete->left? to_delete->left : to_delete->right;
+        if (parent) {
+            if (to_delete == parent->left)
+               parent->left = new_child;
+            else
+               parent->right = new_child;
+        }
+        if (new_child)
+            new_child->parent = parent;
+        delete to_delete;
+    }
+
+protected:
+    virtual void _SerializeHelper(Node<T> *node, std::stringstream &ss) {
+        if (node) {
+            ss << node->value << " ";
+            _SerializeHelper(node->left, ss);
+            _SerializeHelper(node->right, ss);
+        }
+    }
+
+    virtual void _DeserializeHelper(std::stringstream &ss, Node<T> *&node, T &value, T min, T max) {
+        if (ss.eof())
+            return;
+        if (value >= min && value <= max) {
+            node = new Node<T>(value);
+            T old_value = value;
+            ss >> value;
+            _DeserializeHelper(ss, node->left, value, min, old_value);
+            _DeserializeHelper(ss, node->right, value, old_value, max);
+        }
+    }
+
+    virtual void _Deserialize(const std::string &str) {
+        std::stringstream ss(str);
+        T value;
+        ss >> value;
+        _DeserializeHelper(ss, BinaryTree<T>::_root, value, INT_MIN, INT_MAX);
+    }
+
 };
 #endif  //__UTIL_H_
