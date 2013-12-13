@@ -38,11 +38,12 @@ void ReorderString(const std::string &input, int distance) {
         stats[input[i] - 'a'].count++;
     Sort(stats);
 
+    int start_pos = 0;
     std::cout << "Input:" << input << std::endl;
     for (int i = 0; i < N && stats[i].count != 0; i++) {
         char cur_char = stats[i].a;
-        int pos = 0, cur_count = stats[i].count, cur_distance = (input.length() + 1)/ cur_count;
-        if (cur_distance < distance) {
+        int pos = start_pos, cur_count = stats[i].count, cur_distance = (input.length() + 1)/ cur_count;
+        if (cur_distance < distance && cur_count > 1) {
             std::cout << "No Solution for distance " << distance << std::endl;
             return;
         }
@@ -57,6 +58,7 @@ void ReorderString(const std::string &input, int distance) {
             output[pos] = stats[i].a;
             pos += cur_distance;
         }
+        start_pos++;
     }
 
     std::cout << "Reodered string: " << output << " for distance: " << distance << std::endl;
@@ -64,7 +66,7 @@ void ReorderString(const std::string &input, int distance) {
 
 
 int main() {
-    ReorderString("a", 2);
+    ReorderString("a", 3);
     ReorderString("abb", 2);
     ReorderString("abcba", 3);
     ReorderString("abbba", 3);

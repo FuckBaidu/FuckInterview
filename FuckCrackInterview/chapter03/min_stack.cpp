@@ -43,8 +43,40 @@ private:
     ArrayStack< MinStackElement<T> > _imp;
 };
 
+template <class T>
+class MinStack1 : public Stack<T> {
+public:
+    virtual T pop() {
+        T value = _elements.pop();
+        if (value == _min.peek())
+            _min.pop();
+        return value;
+    }
+
+    virtual void push(T value) {
+        if (_min.empty() || value <= _min.peek())
+            _min.push(value);
+        _elements.push(value);
+    }
+
+    virtual T peek() {
+        return _elements.peek();
+    }
+
+    virtual T min() {
+        return _min.peek();
+    }
+
+    virtual bool empty() {
+        return _elements.empty();
+    }
+private:
+    ArrayStack<T> _elements;
+    ArrayStack<T> _min;
+};
+
 void Test() {
-    MinStack<int> stack;
+    MinStack1<int> stack;
     stack.push(5);
     assert(stack.peek() == 5);
     assert(stack.min() == 5);
