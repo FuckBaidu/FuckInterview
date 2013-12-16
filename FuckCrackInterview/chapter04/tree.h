@@ -125,36 +125,52 @@ public:
         }
     }
 
-    void LinkSibling() {
-        if (!_root)
+    void LinkSibling(Node<T> *node) {
+        if (!node)
             return;
+        if (node->right) {
+            Node<T> *sibling_parent = node->sibling, *sibling_child = NULL;
+            while (sibling_parent) {
+                if (sibling_parent->left) {
+                    sibling_child = sibling_parent->left;
+                    break;
+                }
+                if (sibling_parent->right) {
+                    sibling_child = sibling_parent->right;
+                    break;
+                }
+                sibling_parent = sibling_parent->sibling;
+            }
+            node->right->sibling = sibling_child;
+            LinkSibling(node->right);
+        }
 
-        std::queue< Node<T>* > queue;
-        queue.push(_root);
-        Node<T> *last = _root, *head = NULL;
-        while (!queue.empty()) {
-            Node<T>* cur = queue.front();
-            queue.pop();
-            if (head != NULL) {
-                head->sibling = cur;
+        if (node->left) {
+            if (node->right) {
+                node->left->sibling = node->right;
+            } else {
+                Node<T> *sibling_parent = node->sibling, *sibling_child = NULL;
+                while (sibling_parent) {
+                    if (sibling_parent->left) {
+                        sibling_child = sibling_parent->left;
+                        break;
+                    }
+                    if (sibling_parent->right) {
+                        sibling_child = sibling_parent->right;
+                        break;
+                    }
+                    sibling_parent = sibling_parent->sibling;
+                }
+                node->left->sibling = sibling_child;
             }
-            head = cur;
-            if (cur->left != NULL)
-                queue.push(cur->left);
-            if (cur->right != NULL)
-                queue.push(cur->right);
-            if (cur == last) {
-                head = NULL;
-                if (!queue.empty())
-                    last = queue.back();
-            }
+            LinkSibling(node->left);
         }
     }
 
     void PrintBySibling() {
         if (!_root)
             return;
-        LinkSibling();
+        LinkSibling(_root);
         Node<T> *head = _root;
         while (head) {
             Node<T>* cur = head;
