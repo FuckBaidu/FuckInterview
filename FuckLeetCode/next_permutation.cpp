@@ -15,6 +15,8 @@ void Permutation(int pos, char *str, int len, std::vector<std::string> &result) 
             std::swap(str[i], str[pos]);
             Permutation(pos + 1, str, len, result);
             std::swap(str[i], str[pos]);
+            while (i < len - 1 && str[i + 1] == str[i])
+                i++;
         }
     }
 }
@@ -55,6 +57,7 @@ void Test(const std::string &str) {
     char *buf = new char[str.length() + 1];
     buf[str.length()] = '\0';
     memcpy(buf, str.c_str(), str.length());
+    std::sort(buf, buf + str.length());
     std::vector<std::string> result;
     Permutation(0, buf, str.length(), result);
     std::cout << "Permutations of " << str << " is:" <<std::endl;
@@ -67,5 +70,7 @@ int main() {
     Test("ABCD");
     Test("AACD");
     Test("AAAD");
+    Test("121");
+    Test("1201303");
     return 0;
 }

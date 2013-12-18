@@ -27,7 +27,7 @@ void GetSubSets(const std::vector<int> &S, int start, std::vector<int> &result, 
         results.push_back(result);
         GetSubSets(S, i + 1, result, results);
         result.pop_back();
-        while (i < S.size() && S[i + 1] == S[i])
+        while (i < S.size() - 1 && S[i + 1] == S[i])
             i++;
     }
 }
