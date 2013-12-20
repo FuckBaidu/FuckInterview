@@ -22,9 +22,9 @@ int FindMissingNumber(int *array, int len) {
         }
 
         if (odds.size() >= evens.size()) {
-            cur = evens;
+            std::swap(cur, evens);
         } else {
-            cur = odds;
+            std::swap(cur, odds);
             result |= (1 << bit);
         }
         evens.clear();
