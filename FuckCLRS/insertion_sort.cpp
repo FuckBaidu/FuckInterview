@@ -19,10 +19,20 @@ void InsertionSort(int arr[], int len) {
     }
 }
 
+void InsertionSortRecursive(int arr[], int len) {
+    if (len > 1) {
+        InsertionSortRecursive(arr, len - 1);
+        int key = arr[len - 1], i = len - 2;
+        for ( ; i >= 0 && arr[i] > key; i--)
+            arr[i + 1] = arr[i];
+        arr[i + 1] = key;
+    }
+}
+
 int main() {
     int arr[] = {5, 2, 4, 6, 1, 3};
     PrintArray(arr, sizeof(arr) / sizeof(int));
-    InsertionSort(arr, sizeof(arr) / sizeof(int));
+    InsertionSortRecursive(arr, sizeof(arr) / sizeof(int));
     PrintArray(arr, sizeof(arr) / sizeof(int));
     return 0;
 }

@@ -19,6 +19,22 @@ int BinarySearch(int *array, int len, int value) {
     //return index; // If not found, return -1
 }
 
+int BinarySearchRecursive(int *array, int begin, int end, int target) {
+    if (begin > end)
+        return - 1;
+    int mid = (begin + end) / 2;
+    if (target == array[mid])
+        return mid;
+    else if (target > array[mid])
+        return BinarySearchRecursive(array, mid + 1, end, target);
+    else
+        return BinarySearchRecursive(array, begin, mid - 1, target);
+}
+
+int BinarySearchRecursive(int *array, int len, int target) {
+    return BinarySearchRecursive(array, 0, len - 1, target);
+}
+
 void Test(int *array, int len, int value) {
     for (int i = 0; i < len; i++)
         printf("%d ", array[i]);
