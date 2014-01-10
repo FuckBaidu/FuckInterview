@@ -34,9 +34,7 @@ int EvalRPN(std::vector<std::string> &tokens) {
                 result = operand_i / operand_j;
             stack.push(result);
         } else {
-            std::stringstream ss(tokens[i]);
-            int value = 0;
-            ss >> value;
+            int value = atoi(tokens[i].c_str());
             stack.push(value);
         }
     }

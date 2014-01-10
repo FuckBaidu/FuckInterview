@@ -3,55 +3,54 @@
  * http://oj.leetcode.com/problems/sort-list/
  */
 #include "list.h"
-Node<int> *Merge(Node<int> *left_head, Node<int> *right_head, int len, Node<int> *&tail) {
-    Node<int> *left = left_head, *right = right_head, *end = tail->next,
-              *prev = NULL, *head = left_head;
-    int left_len = len / 2, right_len = len - len / 2;
-    while (left_len || right_len) {
-        int left_value = left_len ? left->value : INT_MAX;
-        int right_value = right_len ? right->value : INT_MAX;
+Node<int> *Merge(Node<int> *left, Node<int> *right) {
+    Node<int> *new_head = NULL, *prev = NULL;
+    while (left || right) {
+        int left_valueue = left ? left->value : INT_MAX;
+        int right_valueue = right ? right->value : INT_MAX;
         Node<int> *cur;
-        if (left_value <= right_value) {
+        if (left_valueue < right_valueue) {
             cur = left;
             left = left->next;
-            left_len--;
         } else {
             cur = right;
             right = right->next;
-            right_len--;
         }
+        
         if (prev)
             prev->next = cur;
         else
-            head = cur;
+            new_head = cur;
         prev = cur;
     }
-    // update tail
-    tail = prev;
-    tail->next = end;
-    return head;
+    
+    return new_head;
 }
 
-Node<int> *MergeSort(Node<int> *head, int len, Node<int> *&tail) {
-    if (len > 1) {
-        Node<int> *left_head = MergeSort(head, len / 2, tail);
-        tail = tail->next;
-        Node<int> *right_head = MergeSort(tail, len - len / 2 , tail);
-        head = Merge(left_head, right_head, len, tail);
+Node<int> *MergeSort(Node<int> *&cur, int len) {
+    Node<int> *new_head;
+    if (len == 1) {
+        new_head = cur;
+        cur = cur->next;
+        new_head->next = NULL;
+    } else {
+        Node<int> *left = MergeSort(cur, len / 2);
+        Node<int> *right = MergeSort(cur, len - len / 2);
+        new_head = Merge(left, right);
     }
-    return head;
+    return new_head;
 }
 
 Node<int> *Sort(Node<int> *head) {
     if (!head)
         return NULL;
     int len = 0;
-    Node<int> *tail = head, *cur = head;
+    Node<int> *cur = head;
     while (cur) {
         len++;
         cur = cur->next;
     }
-    return MergeSort(head, len, tail);
+    return MergeSort(head, len);
 }
 
 void Test(int *array, int len) {

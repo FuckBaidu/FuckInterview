@@ -12,75 +12,49 @@ struct Point {
     int y;
 
     Point(int a, int b) : x(a), y(b) { }
-
-    bool operator==(const Point &other) const {
-        return x == other.x && y == other.y;
-    }
-
-    bool operator!=(const Point &other) const {
-        return x != other.x || y != other.y;
-    }
-};
-
-struct PointHash {
-    size_t operator()(const Point &point) const {
-        return point.x * 97 | point.y * 103;
-    }
 };
 
 struct Line {
     double slope;
-    Point start;
 
     bool operator==(const Line &other) const {
-        return slope - other.slope <= kEpsilon && start == other.start;
+        return slope - other.slope <= kEpsilon;
     }
-
-    Line(double _slope, const Point &_start) : slope(_slope), start(_start) { }
 };
 
 struct LineHash {
     size_t operator()(const Line &line) const {
-        return (size_t)line.slope * 97 + (line.start.x * 103 | line.start.y);
+        return (size_t)(line.slope * 1007);
     }
 };
 
-typedef __gnu_cxx::hash_map<Point, int, PointHash> PointHashMap;
 typedef __gnu_cxx::hash_map<Line, int, LineHash> LineHashMap;
 
 int MaxPointsOnLine(const std::vector<Point> &points) {
     int max = 0;
-    PointHashMap point_counts;
-    LineHashMap line_counts;
-    // count the duplicates
-    for (int i = 0; i < points.size(); i++) {
-        if (point_counts.count(points[i]) == 0)
-            point_counts[points[i]] = 0;
-        point_counts[points[i]]++;
-        if (max < point_counts[points[i]])
-            max = point_counts[points[i]];
-    }
-
-    // count the line
-    for (PointHashMap::const_iterator iter_i = point_counts.begin();
-         iter_i != point_counts.end(); ++iter_i) {
-        PointHashMap::const_iterator iter_j = iter_i;
-        ++iter_j;
-        const Point &start = iter_i->first;
-        for (; iter_j != point_counts.end(); ++iter_j) {
-            const Point &end = iter_j->first;
-            double slope;
-            if (end.x == start.x)
-                slope = INT_MAX;
-            else
-                slope = (double)(end.y - start.y) / (end.x - start.x);
-            Line line(slope, start);
-            if (line_counts.count(line) == 0)
-                line_counts[line] = iter_i->second;
-            line_counts[line] += iter_j->second;
-            if (max < line_counts[line])
-                max = line_counts[line];
+    for (int i = 0; i < (int)points.size(); i++) {
+        const Point &start = points[i];
+        Line line;
+        // count the duplicates of start point
+        int num_starts = 1;
+        LineHashMap hash_map;
+        for (int j = i + 1; j < (int)points.size(); j++) {
+            if (points[j].x == start.x && points[j].y == start.y) {
+                num_starts++;
+            } else {
+                if (points[j].x == start.x)
+                    line.slope = INT_MAX;
+                else
+                    line.slope = (double)(points[j].y - start.y) / (points[j].x - start.x);
+                hash_map[line]++;
+            }
         }
+        if (max < num_starts)
+            max = num_starts;
+        for (LineHashMap::const_iterator iter = hash_map.begin();
+             iter != hash_map.end(); ++iter)
+            if (max < num_starts + iter->second)
+                max = num_starts + iter->second;
     }
     return max;
 }
@@ -162,5 +136,13 @@ int main() {
     assert(MaxPointsOnLine(a) == 5);
     a.push_back(Point(-42, -230));
     assert(MaxPointsOnLine(a) == 6);
+
+    a.clear();
+    a.push_back(Point(1, 3));
+    assert(MaxPointsOnLine(a) == 1);
+    a.push_back(Point(1, 3));
+    assert(MaxPointsOnLine(a) == 2);
+    a.push_back(Point(1, 3));
+    assert(MaxPointsOnLine(a) == 3);
     return 0;
 }
