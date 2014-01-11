@@ -13,31 +13,26 @@
 #include <assert.h>
 #include <string>
 #include <set>
+#include <vector>
 
 bool WordBreak(const std::string &s, const std::set<std::string> &dict) {
-    bool **breakable = new bool*[s.length()];
-    for (int i = 0; i < s.length(); i++)
-        breakable[i] = new bool[s.length()];
-    for (int len = 1; len <= s.length(); len++) {
-        for (int i = 0; i < s.length() - len + 1; i++) {
-            breakable[i][i + len - 1] = false;
-            if (dict.count(s.substr(i, len))) {
-                breakable[i][i + len - 1] = true;
-            } else {
-                for (int j = i + 1; j < i + len; j++) {
-                    if (breakable[i][j - 1] && breakable[j][i + len - 1]) {
-                        breakable[i][i + len - 1] = true;
-                        break;
-                    }
+    if (s.empty())
+        return false;
+    std::vector<bool> is_breakable(s.length());
+    for (int i = 0; i < s.length(); i++) {
+        if (dict.count(s.substr(0, i + 1))) {
+            is_breakable[i] = true;
+        } else {
+            is_breakable[i] = false;
+            for (int j = 1; j <= i; j++) {
+                if (is_breakable[j - 1] && dict.count(s.substr(j, i - j + 1))) {
+                    is_breakable[i] = true;
+                    break;
                 }
             }
         }
     }
-    bool result = breakable[0][s.length() - 1];
-    for (int i = 0; i < s.length(); i++)
-        delete breakable[i];
-    delete[] breakable;
-    return result;
+    return is_breakable.back();
 }
 
 int main() {

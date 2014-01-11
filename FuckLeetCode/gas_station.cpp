@@ -13,19 +13,20 @@
 #include <vector>
 #include <assert.h>
 int CanCompleteCircuit(const std::vector<int> &gas, const std::vector<int> &cost) {
-    int start = 0, left = 0, right = 0;
+    int start = 0, sum = 0, cur = 0;
     for (int i = 0; i < gas.size(); i++) {
-        int difference = gas[i] - cost[i];
-        right += difference;
-        if (right < 0) {
-            start = i + 1;
-            left += right;
-            right = 0;
+        if (cur < 0) {
+            start = i;
+            cur = 0;
         }
+        int left = gas[i] - cost[i];
+        sum += left;
+        cur += left;
     }
-    if (start == gas.size() || right + left < 0)
-        start = -1;
-    return start;
+    if (sum < 0)
+        return -1;
+    else
+        return start;
 }
 
 int main() {

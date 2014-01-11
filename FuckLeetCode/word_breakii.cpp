@@ -16,30 +16,39 @@
 #include <set>
 #include <vector>
 
-std::vector<std::string> WordBreak(const std::string &s, const std::set<std::string> &dict, int start, std::vector<bool> &is_breakable) {
-    std::vector<std::string> result;
-    std::string substr = s.substr(start, s.length() - start);
-    if (dict.count(substr))
-        result.push_back(substr);
-    for (int i = start + 1; i < s.length(); i++) {
-        substr = s.substr(start, i - start);
-        if (dict.count(substr) && is_breakable[i]) {
-            std::vector<std::string> tmp = WordBreak(s, dict, i, is_breakable);
-            if (tmp.empty()) {
-                is_breakable[i] = false;
-            } else {
-                for (int j = 0; j < tmp.size(); j++)
-                    result.push_back(substr + " " + tmp[j]);
+void WordBreak(const std::string &s, int start, const std::set<std::string> &dict, 
+               std::vector<bool> &is_breakable, std::vector<std::string> &path,
+               std::vector<std::string> &result) {
+    if (start == s.length()) {
+        std::string tmp = path[0];
+        for (int i = 1; i < path.size(); i++)
+            tmp += " " + path[i];
+        result.push_back(tmp);
+    } else {
+        for (int i = start; i < s.length(); i++) {
+            if (!is_breakable[i + 1])
+                continue;
+            std::string cur(s.begin() + start, s.begin() + i + 1);
+            if (dict.count(cur)) {
+                path.push_back(cur);
+                int size_before = result.size();
+                WordBreak(s, i + 1, dict, is_breakable, path, result);
+                int size_after = result.size();
+                if (size_before == size_after)
+                    is_breakable[i + 1] = false;
+                path.pop_back();
             }
         }
     }
-    return result;
 }
 
 std::vector<std::string> WordBreak(const std::string &s, const std::set<std::string> &dict) {
-    // Record whether the substr(i, end) can be broken into words to eliminate the search space
-    std::vector<bool> is_breakable(s.length(), true); 
-    return WordBreak(s, dict, 0, is_breakable);
+    std::vector<std::string> path, result;
+    if (!s.empty()) {
+        std::vector<bool> is_breakable(s.length() + 1, true);
+        WordBreak(s, 0, dict, is_breakable, path, result);
+    }
+    return result;
 }
 
 void Test(const std::string &str, const std::set<std::string> &dict) {
