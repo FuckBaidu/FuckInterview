@@ -24,23 +24,23 @@ The flattened tree should look like:
  *
  */
 #include "tree.h"
-Node<int> *ToDoubleLinkedList(Node<int> *node, Node<int> *prev) {
-    Node<int> *left = node->left, *right = node->right, *last = node;
-    node->left = prev;
-    node->right = left ? left : right;
-    if (left)
-        last = ToDoubleLinkedList(left, node);
-    if (right) {
+Node<int> *ToDoubleLinkedList(Node<int> *node) {
+    Node<int> *right = node->right, *last = node;
+    if (node->left) {
+        node->right = node->left;
+        last = ToDoubleLinkedList(node->left);
+        node->left = NULL;
         last->right = right;
-        last = ToDoubleLinkedList(right, last);
     }
+    if (right)
+        last = ToDoubleLinkedList(right);
     return last;
 }
 
 void Flatten(Node<int> *root) {
     if (!root)
         return;
-    ToDoubleLinkedList(root, NULL);
+    ToDoubleLinkedList(root);
 }
 
 void Test(const std::string &rep) {

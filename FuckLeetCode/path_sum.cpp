@@ -17,25 +17,29 @@
  * ]
  */
 #include "tree.h"
-void PathSum(Node<int> *root, int sum, std::vector<int> path, std::vector< std::vector<int> > &results) {
+void PathSum(Node<int> *root, int sum, std::vector<int> &path, std::vector< std::vector<int> > &results) {
     if (!root)
         return;
     sum -= root->value;
     path.push_back(root->value);
-    if (sum == 0 && !root->left && !root->right) {
-        results.push_back(path);
+    if (!root->left && !root->right) {
+        if (sum == 0)
+            results.push_back(path);
     } else {
         if (root->left)
             PathSum(root->left, sum, path, results);
         if (root->right)
             PathSum(root->right, sum, path, results);
     }
+    path.pop_back();
 }
 
 std::vector< std::vector<int> > PathSum(Node<int> *root, int sum) {
     std::vector< std::vector<int> > results;
-    if (root)
-        PathSum(root, sum, std::vector<int>(), results);
+    if (root) {
+        std::vector<int> path;
+        PathSum(root, sum, path, results);
+    }
     return results;
 }
 

@@ -1,46 +1,76 @@
 /**
+ * Problem 1:
  * Say you have an array for which the ith element is the price of a given stock on day i.
- * If you were only permitted to buy one share of the stock and sell one share of the stock, design
- * an algorithm to find the best times to buy and sell.
+ *
+ * If you were only permitted to complete at most one transaction (ie, buy one and sell one share of the stock), design an algorithm to find the maximum profit.
+ *
+ * Problem 2:
+ * Say you have an array for which the ith element is the price of a given stock on day i.
+ *
+ * Design an algorithm to find the maximum profit. You may complete as many transactions as you like (ie, buy one and sell one share of the stock multiple times). However, you may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
+ *
+ * Problem 3:
+ * Say you have an array for which the ith element is the price of a given stock on day i.
+ *
+ * Design an algorithm to find the maximum profit. You may complete at most two transactions.
+ *
+ * Note:
+ * You may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
  */
-#include <assert.h>
-void FindBestBuyAndSellDay(int prices[], int num, int *buy, int *sell) {
-    int max = 0, min = 0, profit = 0, max_profit = 0;
-    *buy = 0, *sell = 0;
-    for (int i = 0; i < num; i++) {
-        if (prices[i] > prices[max]) {
-            max = i;
-            profit = prices[max] - prices[min];
-            if (profit > max_profit) {
-                *buy = min;
-                *sell = max;
-                max_profit = profit;
-            }
-        } else if (prices[i] < prices[min]) {
-            min = i;
-            max = i;
+#include <vector>
+int MaxProfit1(std::vector<int> &prices) {
+    if (prices.empty())
+        return 0;
+    int max = 0, buy = 0, sell = 0;
+    for (int i = 1; i < prices.size(); i++) {
+        if (prices[i] < prices[buy])
+            buy = i;
+        if (max < prices[i] - prices[buy])
+            max = prices[i] - prices[buy];
+    }
+    return max;
+}
+
+int MaxProfit2(std::vector<int> &prices) {
+    if (prices.empty())
+        return 0;
+    int max = 0, buy = 0;
+    for (int i = 1; i < prices.size(); i++) {
+        if (prices[i] < prices[i - 1]) {
+            max += prices[i - 1] - prices[buy];
+            buy = i;
         }
     }
+    max += prices.back() - prices[buy];
+    return max;
+}
+
+int MaxProfit3(std::vector<int> &prices) {
+    if (prices.empty())
+        return 0;
+    int max = 0, max_left = 0, buy = 0, sell = prices.size() - 1;
+    std::vector<int> max_right(prices.size(), 0);
+    for (int i = (int)prices.size() - 1; i >= 0; i--) {
+        if (prices[i] > prices[sell])
+            sell = i;
+        max_right[i] = prices[sell] - prices[i];
+    }
+    for (int i = 0; i < prices.size(); i++) {
+        if (prices[i] < prices[buy])
+            buy = i;
+        if (max_left < prices[i] - prices[buy])
+            max_left = prices[i] - prices[buy];
+        if (max < max_left + max_right[i])
+            max = max_left + max_right[i];
+    }
+    return max;
 }
 
 int main() {
-    int buy = 0;
-    int sell = 0;
-    int test1[3] = {1, 3, 2};
-    FindBestBuyAndSellDay(test1, sizeof(test1) / sizeof(int), &buy, &sell);
-    assert(buy == 0);
-    assert(sell == 1);
-    int test2[5] = {5, 4, 3, 2, 1};
-    FindBestBuyAndSellDay(test2, sizeof(test2) / sizeof(int), &buy, &sell);
-    assert(buy == 0);
-    assert(sell == 0);
-    int test3[10] = {3, 9, 6, 2, 1, 7, 5, 3, 4, 8};
-    FindBestBuyAndSellDay(test3, sizeof(test3) / sizeof(int), &buy, &sell);
-    assert(buy == 4);
-    assert(sell == 9);
-    int test4[5] = {2, 8, 1, 4, 9};
-    FindBestBuyAndSellDay(test4, sizeof(test4) / sizeof(int), &buy, &sell);
-    assert(buy == 2);
-    assert(sell == 4);
+    int a[10] = {3, 9, 6, 2, 1, 7, 5, 3, 4, 8};
+    std::vector<int> test(a, a + 10);
+    assert(MaxProfit1(test) == 7);
+    assert(MaxProfit2(test) == 17);
+    assert(MaxProfit3(test) == 13);
     return 0;
 }

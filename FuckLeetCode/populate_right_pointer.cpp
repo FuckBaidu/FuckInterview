@@ -1,4 +1,5 @@
 /*
+ * Problem 1:
  * Given a binary tree
  * struct Node {
  *   Node* leftChild;
@@ -7,6 +8,7 @@
  * }
  * Populate the nextRight pointers in each node.
  * You may assume that it is a full binary tree (ie, each node other than the leaves has two children.)
+ *
  */
 #include <assert.h>
 #include <queue>
