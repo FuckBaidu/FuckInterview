@@ -11,16 +11,16 @@ struct ListNode {
     ListNode(int v) : value(v), next(NULL) { }
 };
 
-Node<int> *SortedListToBST(ListNode *&head, int begin, int end) {
-    if (begin > end) {
+Node<int> *SortedListToBST(ListNode *&head, int len) {
+    if (len == 0) {
         return NULL;
     } else {
-        int mid = begin + (end - begin) / 2;
-        Node<int> *left = SortedListToBST(head, begin, mid - 1);
+        int left_len = (len - 1) / 2;
+        Node<int> *left = SortedListToBST(head, left_len);
         Node<int> *node = new Node<int>(head->value);
         node->left = left;
         head = head->next;
-        node->right = SortedListToBST(head, mid + 1, end);
+        node->right = SortedListToBST(head, len - left_len - 1);
         return node;
     }
 }
@@ -33,7 +33,7 @@ Node<int> *SortedListToBST(ListNode *head) {
         cur = cur->next;
     }
     Node<int> *root = NULL;
-    root = SortedListToBST(head, 0, len - 1);
+    root = SortedListToBST(head, len);
     return root;
 }
 
