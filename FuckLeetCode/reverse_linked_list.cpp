@@ -46,31 +46,37 @@ Node<int>* ReverseList1(Node<int> *head) {
 }
 
 Node<int> *ReverseList(Node<int> *head, int m, int n) {
-    if (!head)
-        return NULL;
-    int distance = n - m + 1;
-    Node<int> *start = head, *end = head, *before = NULL;
-    for (int i = 0; i < distance; i++)
-        end = end->next;
-    for (int i = 1; i < m; i++) {
-        before = start;
-        start = start->next;
-        end = end->next;
-    }
-    Node<int> *prev = end, *next = NULL;
-    while (start != end) {
-        if (start->next == end) {
-            if (!before)
-                head = start;
-            else
-                before->next = start;
+    Node<int> *before = NULL, *after = NULL, *cur = head, *prev = NULL;
+    int count = 1;
+    while (cur) {
+        if (count == m)
+            before = prev;
+        if (count == n) {
+            after = cur->next;
+            break;
         }
-        next = start->next;
-        start->next = prev;
-        prev = start;
-        start = next;
+        prev = cur;
+        cur = cur->next;
+        count++;
     }
-
+    
+    if (before)
+        cur = before->next;
+    else
+        cur = head;
+    prev = after;
+    while (cur != after) {
+        if (cur->next == after) {
+            if (before)
+                before->next = cur;
+            else
+                head = cur;
+        }
+        Node<int> *next = cur->next;
+        cur->next = prev;
+        prev = cur;
+        cur = next;
+    }
     return head;
 }
 

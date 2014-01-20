@@ -19,13 +19,13 @@
  */
 #include <vector>
 #include <iostream>
-void GetSubSets(const std::vector<int> &S, int start, std::vector<int> &result, std::vector< std::vector<int> > &results) {
+void SubSetsWithDup(const std::vector<int> &S, int start, std::vector<int> &result, std::vector< std::vector<int> > &results) {
     if (start == S.size())
         return;
     for (int i = start; i < S.size(); i++) {
         result.push_back(S[i]);
         results.push_back(result);
-        GetSubSets(S, i + 1, result, results);
+        SubSetsWithDup(S, i + 1, result, results);
         result.pop_back();
         while (i < S.size() - 1 && S[i + 1] == S[i])
             i++;
@@ -33,15 +33,13 @@ void GetSubSets(const std::vector<int> &S, int start, std::vector<int> &result, 
 }
 
 std::vector< std::vector<int> > SubsetsWithDup(std::vector<int> &S) {
-    std::vector< std::vector<int> > results;
+    std::vector< std::vector<int> > result(1);
     if (!S.empty()) {
         std::sort(S.begin(), S.end());
-        // add empty set
-        std::vector<int> result;
-        results.push_back(result);
-        GetSubSets(S, 0, result, results);
+        std::vector<int> path;
+        SubSetsWithDup(S, 0, path, result);
     }
-    return results;
+    return result;
 }
 
 int main() {

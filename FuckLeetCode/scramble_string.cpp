@@ -77,13 +77,11 @@ bool IsScramble(const std::string &s1, const std::string &s2) {
                     result[len][i][j] = 1;
                 } else {
                     result[len][i][j] = 0;
-                    if (IsAnagram(substr1, substr2)) {
-                        for (int k = 1; k < len; k++) {
-                            if (result[k][i][j] && result[len - k][i + k][j + k]
-                                || result[k][i][j + len - k] && result[len - k][i + k][j]) {
-                                result[len][i][j] = 1;
-                                break;
-                            }
+                    for (int k = 1; k < len; k++) {
+                        if (result[k][i][j] && result[len - k][i + k][j + k]
+                            || result[k][i][j + len - k] && result[len - k][i + k][j]) {
+                            result[len][i][j] = 1;
+                            break;
                         }
                     }
                 }

@@ -19,20 +19,25 @@
  * that.
  */
 #include <vector>
+#include <iostream>
 
 std::vector<int> GrayCode(int n) {
-    std::vector<int> cur;
-    if (n >= 0) {
-        cur.push_back(0);
-        for (int i = 1; i <= n; i++) {
-            for (int j = cur.size() - 1; j >= 0; j--) {
-                cur.push_back((1 << (i - 1)) | cur[j]);
-            }
-        }
-    }
-    return cur;
+    std::vector<int> result(1, 0);
+    for (int i = 1; i <= n; i++)
+        for (int j = (int)result.size() - 1; j >= 0; j--)
+            result.push_back(result[j] | (1 << (i - 1)));
+    return result;
+}
+
+void Test(int n) {
+    std::vector<int> result = GrayCode(n);
+    std::cout << "n = " << n << std::endl;
+    for (int i = 0; i < result.size(); i++)
+        std::cout << result[i] << " - " << i << std::endl;
 }
 
 int main() {
+    Test(3);
+    Test(5);
     return 0;
 }
