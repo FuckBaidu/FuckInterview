@@ -15,23 +15,26 @@
  */
 #include <iostream>
 #include <vector>
-void CombinationHelper(int cur, int n, int idx, std::vector<int> &result, std::vector< std::vector<int> > &results) {
-    if (idx == result.size()) {
-        results.push_back(result);
-        return;
-    }
-    for (int i = cur; i <= n; i++) {
-        result[idx] = i;
-        CombinationHelper(i + 1, n, idx + 1, result, results);
+void Solve(int n, int k, std::vector<int> &path, std::vector< std::vector<int> > &result) {
+    if (path.size() == k) {
+        result.push_back(path);
+    } else {
+        int start = path.empty() ? 1 : path.back() + 1;
+        for (int i = start; i <= n - k + 1 + path.size(); i++) {
+            path.push_back(i);
+            Solve(n, k, path, result);
+            path.pop_back();
+        }
     }
 }
 
-std::vector<std::vector<int> > Combination(int n, int k) {
-    std::vector<int> result;
-    result.resize(k);
-    std::vector< std::vector<int> > results;
-    CombinationHelper(1, n, 0, result, results);
-    return results;
+std::vector< std::vector<int> > Combination(int n, int k) {
+    std::vector< std::vector<int> > result;
+    if (k > 0 && k <= n) {
+        std::vector<int> path;
+        Solve(n, k, path, result);
+    }
+    return result;
 }
 
 void Test(int n, int k) {

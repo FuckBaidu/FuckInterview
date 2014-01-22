@@ -11,31 +11,34 @@ struct ListNode {
     ListNode *next;
     ListNode *random;
     ListNode(int v) : value(v), next(NULL), random(NULL) { }
+    ListNode(const ListNode *node) : value(node->value), next(node->next), random(node->random){ }
 };
 
+ListNode *GetNewNode(std::map<ListNode*, ListNode*> &map, ListNode *cur) {
+    ListNode *node;
+    if (map.count(cur)) {
+        node = map[cur];
+    } else {
+        node = new ListNode(cur);
+        map[cur] = node;
+    }
+    return node;
+}
+
 ListNode *CopyRandomList(ListNode *head) {
-    ListNode *new_head = NULL, *prev = NULL, *cur = head;
+    ListNode *new_head = NULL, *cur = head;
     std::map<ListNode*, ListNode*> map;
     while (cur) {
-        // allocate and copy node
-        ListNode *node = new ListNode(cur->value);
-        node->random = cur->random;
-        // For random pointer modify later
-        map[cur] = node;
-        if (prev == NULL) {
+        // Getnew node
+        ListNode *node = GetNewNode(map, cur);
+        if (!new_head)
             new_head = node;
-        } else {
-            prev->next = node;
-        }
-        prev = node;
-        cur = cur->next;
-    }
-
-    // Modify random pointer
-    cur = new_head;
-    while (cur) {
+        // Set next pointer
+        if (cur->next)
+            node->next = GetNewNode(map, cur->next);
+        // Set random pointer
         if (cur->random)
-            cur->random = map[cur->random];
+            node->random = GetNewNode(map, cur->random);
         cur = cur->next;
     }
     return new_head;
