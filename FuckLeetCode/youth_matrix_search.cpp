@@ -41,6 +41,7 @@ bool SearchYouthMatrix(int **matrix, int left, int right, int up, int down,
            || SearchYouthMatrix(matrix, mid_col + 1, right, up, end_row, target, result);
 }
 
+// Still O(n)
 bool SearchYouthMatrix(int **matrix, int m, int n, int target, std::pair<int, int> &result) {
     return SearchYouthMatrix(matrix, 0, n - 1, 0, m -1, target, result);
 }
