@@ -22,33 +22,38 @@
 void FourSum(int target, std::vector<int> &num, std::vector< std::vector<int> > &results) {
     std::sort(num.begin(), num.end());
     for (int i = 0; i < (int)num.size() - 3; i++) {
-        if (i > 0 && num[i] == num[i - 1])
-            continue;
         for (int j = i + 1; j < (int)num.size() - 2; j++) {
-            if (j > i + 1 && num[j] == num[j - 1])
-                continue;
-            int cur_sum = target - (num[i] + num[j]), m = j + 1, n = num.size() - 1;
-            while (m < n) {
-                if (cur_sum == num[m] + num[n]) {
-                    results.push_back(std::vector<int>());
-                    results.back().push_back(num[i]);
-                    results.back().push_back(num[j]);
-                    results.back().push_back(num[m]);
-                    results.back().push_back(num[n]);
+            int sum = target - num[i] - num[j], begin = j + 1, end = (int)num.size() - 1;
+            while (begin < end) {
+                int cur_sum = num[begin] + num[end];
+                if (cur_sum == sum) {
+                    std::vector<int> quadruplet;
+                    quadruplet.push_back(num[i]);
+                    quadruplet.push_back(num[j]);
+                    quadruplet.push_back(num[begin]);
+                    quadruplet.push_back(num[end]);
+                    results.push_back(quadruplet);
+                    do { 
+                        begin++;
+                    } while (begin < end && num[begin] == num[begin - 1]);
                     do {
-                        m++;
-                    } while (m < n && num[m] == num[m - 1]);
-                } else if (cur_sum < num[m] + num[n]) {
+                        end--;
+                    } while (end > begin && num[end] == num[end + 1]);
+                } else if (cur_sum > sum) {
                     do {
-                        n--;
-                    } while (n > m && num[n] == num[n + 1]);
+                        end--;
+                    } while (end > begin && num[end] == num[end + 1]);
                 } else {
-                    do {
-                        m++;
-                    } while (m < n && num[m] == num[m - 1]);
+                    do { 
+                        begin++;
+                    } while (begin < end && num[begin] == num[begin - 1]);
                 }
             }
+            while (j < (int)num.size() - 2 && num[j] == num[j + 1])
+                j++;
         }
+        while (i < (int)num.size() - 3 && num[i] == num[i + 1])
+            i++;
     }
 }
 

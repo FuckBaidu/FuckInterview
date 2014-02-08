@@ -12,35 +12,31 @@
 #include <assert.h>
 #include <vector>
 std::vector<int> SearchRange(int A[], int n, int target) {
-    int begin = 0, end = n, lower_bound = -1, uppder_bound = -1;
-    std::vector<int> result;
-    while (begin < end) {
-        int mid = begin + (end - begin) / 2;
+    int begin = 0, end = n - 1, lower_bound, upper_bound;
+    std::vector<int> result(2, -1);
+    while (begin <= end) {
+        int mid = (begin + end) / 2;
         if (target > A[mid])
             begin = mid + 1;
         else
-            end = mid;
+            end = mid - 1;
     }
-    if (A[begin] == target)
-        lower_bound = begin;
-    else
-        goto LABEL_EXIT;
-    begin = lower_bound, end = n;
-    while (begin < end) {
-        int mid = begin + (end - begin) / 2;
+    if (begin == n || A[begin] != target)
+        return result;
+    lower_bound = begin;
+    begin = 0, end = n -1;
+    while (begin <= end) {
+        int mid = (begin + end) / 2;
         if (target < A[mid])
-            end = mid;
+            end = mid - 1;
         else
-            begin = mid + 1;
+            begin = mid + 1; 
     }
-    begin--;
-    if (A[begin] == target)
-        uppder_bound = begin;
-    else
-        goto LABEL_EXIT;
-LABEL_EXIT:
-    result.push_back(lower_bound);
-    result.push_back(uppder_bound);
+    if (end == -1 || A[end] != target)
+        return result;
+    upper_bound = end;
+    result[0] = lower_bound;
+    result[1] = upper_bound;
     return result;
 }
 

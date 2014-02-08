@@ -22,34 +22,18 @@ void Permutation(int pos, char *str, int len, std::vector<std::string> &result) 
 }
 
 std::string NextPermutation(const std::string &str) {
-    char *buf = new char[str.length() + 1];
-    buf[str.length()] = '\0';
-    memcpy(buf, str.c_str(), str.length());
-    if (str.length() <= 1)
-        return str;
-    int i = str.length() - 2;
-    for (; i >= 0; i--) {
-        if (str[i] < str[i + 1])
+    std::string result = str;
+    int i = (int)result.length() - 2;
+    for ( ; i >= 0; i--)
+        if (result[i] < result[i + 1])
             break;
+    if (i != -1) {
+        int j = i + 1;
+        while (j < result.size() && result[j] > result[i])
+            j++;
+        std::swap(result[i], result[--j]);
     }
-    if (i == -1)
-        return str;
-    int j = str.length() - 1;
-    for (; j >= 0; j--) {
-        if (str[j] > str[i])
-            break;
-    }
-    std::swap(buf[i], buf[j]);
-    ++i;
-    j = str.length() - 1;
-    while (i < j) {
-        std::swap(buf[i], buf[j]);
-        i++;
-        j--;
-    }
-
-    std::string result(buf);
-    delete[] buf;
+    std::reverse(result.begin() + i + 1, result.end());
     return result;
 }
 
