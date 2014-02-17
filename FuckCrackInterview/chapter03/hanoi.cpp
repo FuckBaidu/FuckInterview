@@ -9,8 +9,9 @@
  */
 #include "util.h"
 #include <stdio.h>
+#include <stack>
 void Hanoi(int n, int from, int by, int to) {
-    if (n >= 1) {
+    if (n > 0) {
         Hanoi(n-1, from, to, by);
         printf("move disk %d from rod %d to rod %d\n", n, from, to);
         Hanoi(n-1, by, from, to);
@@ -57,11 +58,53 @@ void Hanoi(int n) {
     }
 }
 
+struct Peg {
+    int id;
+    std::stack<int> disks;
+    Peg(int i) : id(i) { }
+};
+
+bool MoveBetween(Peg &a, Peg &b) {
+    if (a.disks.empty() && b.disks.empty())
+        return false;
+    if (a.disks.empty() || (!b.disks.empty() && a.disks.top() > b.disks.top())) {
+        printf("move disk %d from peg %d to peg %d\n", b.disks.top(), b.id, a.id);
+        a.disks.push(b.disks.top());
+        b.disks.pop();
+    } else {
+        printf("move disk %d from peg %d to peg %d\n", a.disks.top(), a.id, b.id);
+        b.disks.push(a.disks.top());
+        a.disks.pop();
+    }
+    return true;
+}
+
+void HanoiIterative(int n) {
+    Peg source(1), destination(3), auxiliary(2);
+    for (int i = n; i >= 1; i--)
+        source.disks.push(i);
+    while (destination.disks.size() != n) {
+        if (n & 1) {
+            if (!MoveBetween(source, destination))
+                break;
+            if (!MoveBetween(source, auxiliary))
+                break;
+        } else {
+            if (!MoveBetween(source, auxiliary))
+                break;
+            if (!MoveBetween(source, destination))
+                break;
+        }
+        if (!MoveBetween(auxiliary, destination))
+            break;
+    }
+}
+
 int main() {
-    for (int i = 1; i <= 8; i++) {
+    for (int i = 1; i <= 4; i++) {
         printf("Solution for %d disks:\n", i);
         //Hanoi(i, 1, 2, 3);
-        Hanoi(i);
+        HanoiIterative(i);
     }
     return 0;
 }

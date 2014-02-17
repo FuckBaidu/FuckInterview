@@ -19,6 +19,7 @@
  */
 #include <vector>
 #include <string>
+#include <stack>
 #include <assert.h>
 bool Solve(const std::vector< std::vector<char> > &board, const std::string &word, int index, std::pair<int, int> cur,
            std::vector< std::vector<bool> > &visited) {
@@ -77,13 +78,76 @@ bool Exist(std::vector< std::vector<char> > &board, std::string word) {
     return false;
 }
 
+struct State {
+    int row;
+    int col;
+    int len;
+    State(int r, int c, int l) : row(r), col(c), len(l) { }
+};
+
+bool ExistIterative(std::vector< std::vector<char> > &board, std::string word) {
+    if (word.empty())
+        return true;
+    if (board.empty() || board[0].empty())
+        return false;
+    int m = board.size(), n = board[0].size(), prev_len = 0;
+    std::stack<State> stack;
+    std::vector< std::vector<bool> > visited (m, std::vector<bool>(n, false));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (board[i][j] == word[0])
+                stack.push(State(i, j, 1));
+    while (!stack.empty()) {
+        State cur = stack.top();
+        if (cur.len == word.length())
+            return true;
+        visited[cur.row][cur.col] = true;
+        bool found_next = false;
+        State next(cur.row, cur.col, cur.len + 1);
+        if (prev_len <= cur.len) {
+            for (int i = 0; i < 4; i++) {
+                switch (i) {
+                case 0: //up
+                    next.row = cur.row - 1;
+                    next.col = cur.col;
+                    break;
+                case 1:  // down
+                    next.row = cur.row + 1;
+                    next.col = cur.col;
+                    break;
+                case 2:  // left
+                    next.row = cur.row;
+                    next.col = cur.col - 1; 
+                    break;
+                case 3:  // right
+                    next.row = cur.row;
+                    next.col = cur.col + 1; 
+                    break;
+                }
+                if (next.row >= 0 && next.row < m && next.col >= 0 && next.col < n 
+                    && board[next.row][next.col] == word[next.len - 1] 
+                    && !visited[next.row][next.col]) {
+                    stack.push(next);
+                    found_next = true;
+                }
+            }
+        }
+        if (!found_next) {
+            visited[cur.row][cur.col] = false;
+            stack.pop();
+        }
+        prev_len = cur.len;
+    }
+    return false;
+}
+
 int main() {
     std::vector< std::vector<char> > board;
     char a[][5] = { {"ABCE"}, {"SFCS"}, {"ADEE"} };
     for (int i = 0; i < 3; i++)
         board.push_back(std::vector<char>(a[i], a[i] + 4));
-    assert(Exist(board, "ABCCED"));
-    assert(Exist(board, "SEE"));
-    assert(!Exist(board, "ABCB"));
+    assert(ExistIterative(board, "ABCCED"));
+    assert(ExistIterative(board, "SEE"));
+    assert(!ExistIterative(board, "ABCB"));
     return 0;
 }
